@@ -402,7 +402,7 @@ void GalaxyTapeAudioProcessorEditor::drawRotaryArtwork(juce::Graphics& g, float 
         if (dial.image.isNull())
             continue;
 
-        const auto& slider = *knobs[dial.knobIndex];
+        auto& slider = *knobs[dial.knobIndex];
         const float angle = static_cast<float>(
             (slider.valueToProportionOfLength(slider.getValue()) - dial.defaultPosition)
             * juce::MathConstants<double>::twoPi * 0.75);
