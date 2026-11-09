@@ -3,7 +3,7 @@
 
 namespace
 {
-constexpr float maximumDelaySeconds = 2.0f;
+constexpr float maximumDelaySeconds = 12.0f;
 
 juce::AudioParameterFloatAttributes linearAttributes(const juce::String& label)
 {
@@ -32,7 +32,7 @@ GalaxyTapeAudioProcessor::createParameterLayout()
                                        1.0f, linearAttributes("x")));
     layout.add(std::make_unique<Float>("head_select", "Head Select",
                                        juce::NormalisableRange<float>(0.0f, 7.0f, 1.0f),
-                                       4.0f));
+                                       1.0f));
     layout.add(std::make_unique<Float>("echo_rate", "Echo Rate",
                                        juce::NormalisableRange<float>(40.0f, 1600.0f, 1.0f, 0.4f),
                                        360.0f, linearAttributes("ms")));
@@ -62,8 +62,8 @@ GalaxyTapeAudioProcessor::createParameterLayout()
                                        1.0f, linearAttributes("x")));
     layout.add(std::make_unique<Bool>("input_send", "Input Send", true));
     layout.add(std::make_unique<Bool>("head_1", "Head 1", true));
-    layout.add(std::make_unique<Bool>("head_2", "Head 2", true));
-    layout.add(std::make_unique<Bool>("head_3", "Head 3", true));
+    layout.add(std::make_unique<Bool>("head_2", "Head 2", false));
+    layout.add(std::make_unique<Bool>("head_3", "Head 3", false));
     layout.add(std::make_unique<Bool>("tempo_sync", "Tempo Sync", false));
     layout.add(std::make_unique<Bool>("tape_loop", "Tape Loop", false));
     layout.add(std::make_unique<Choice>("tape_mode", "Tape Mode",
@@ -85,6 +85,7 @@ void GalaxyTapeAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBl
     lowBandState.fill(0.0f);
     highBandState.fill(0.0f);
     writePosition = 0;
+    currentReverbMode = -1;
     tapePhase = 0.0;
     reverb.reset();
 }
@@ -203,18 +204,24 @@ void GalaxyTapeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
                 nearest = beats;
         delayMs = static_cast<float>(nearest * 60000.0 / bpm);
     }
+    effectiveDelayMs.store(delayMs, std::memory_order_relaxed);
 
     const float tapeSaturation[3] = {1.05f, 1.35f, 1.8f};
     const float highFrequencyLoss[3] = {0.02f, 0.12f, 0.28f};
     const float wowDepthMs[3] = {0.015f, 0.09f, 0.22f};
-    juce::Reverb::Parameters reverbParameters;
-    reverbParameters.roomSize = 0.78f;
-    reverbParameters.damping = juce::jlimit(0.15f, 0.95f, 0.45f + highFrequencyLoss[tapeMode]);
-    reverbParameters.wetLevel = 1.0f;
-    reverbParameters.dryLevel = 0.0f;
-    reverbParameters.width = 1.0f;
-    reverbParameters.freezeMode = 0.0f;
-    reverb.setParameters(reverbParameters);
+    if (tapeMode != currentReverbMode)
+    {
+        juce::Reverb::Parameters reverbParameters;
+        reverbParameters.roomSize = 0.78f;
+        reverbParameters.damping = juce::jlimit(0.15f, 0.95f,
+                                                0.45f + highFrequencyLoss[tapeMode]);
+        reverbParameters.wetLevel = 1.0f;
+        reverbParameters.dryLevel = 0.0f;
+        reverbParameters.width = 1.0f;
+        reverbParameters.freezeMode = 0.0f;
+        reverb.setParameters(reverbParameters);
+        currentReverbMode = tapeMode;
+    }
 
     const float echoLeftPan = std::sqrt(0.5f * (1.0f - echoPan));
     const float echoRightPan = std::sqrt(0.5f * (1.0f + echoPan));

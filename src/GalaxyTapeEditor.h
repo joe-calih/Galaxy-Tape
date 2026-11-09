@@ -9,24 +9,30 @@ public:
     struct Preset
     {
         const char* name;
-        float input;
-        float head;
         float rate;
+        float feedback;
+        float bass;
         float treble;
         float echoPan;
         float reverbPan;
-        float feedback;
-        float bass;
         float echo;
         float reverb;
-        float output;
-        float head1;
-        float head2;
-        float head3;
-        float sync;
-        float loop;
         float tapeMode;
+        float headSelect;
+        bool head1;
+        bool head2;
+        bool head3;
+        bool tempoSync;
         float wetSolo;
+    };
+
+    struct RotaryArtwork
+    {
+        juce::Image image;
+        juce::Point<float> centre;
+        float radius = 0.0f;
+        size_t knobIndex = 0;
+        double defaultPosition = 0.0;
     };
 
     explicit GalaxyTapeAudioProcessorEditor(GalaxyTapeAudioProcessor&);
@@ -44,6 +50,18 @@ private:
     void applyPreset(int index);
     void selectComparison(int slot);
     void setParameter(const juce::String& id, float value);
+    void showSettingsMenu();
+    void showInfoMenu();
+    void showAbout();
+    void showLoopsAbout();
+    void showLicenseInfo();
+    void setZoomPercent(int percent);
+    void addRotaryArtwork(size_t knobIndex, float radius);
+    void drawRotaryArtwork(juce::Graphics& graphics, float scale);
+    void drawBranding(juce::Graphics& graphics, float scale);
+    void drawHeadDisplays(juce::Graphics& graphics, float scale);
+    void drawSwitches(juce::Graphics& graphics, float scale);
+    void drawPeakIndicator(juce::Graphics& graphics, float scale);
     void drawMeter(juce::Graphics& graphics);
 
     GalaxyTapeAudioProcessor& processor;
@@ -56,15 +74,21 @@ private:
     juce::TextButton copyButton{"COPY"};
     juce::TextButton pasteButton{"PASTE"};
     juce::TextButton tapeModeButton;
+    juce::TextButton infoButton{"INFO"};
+    juce::TextButton sizeButton{"100%"};
     std::vector<std::unique_ptr<juce::Slider>> knobs;
+    std::vector<juce::Rectangle<int>> knobBounds;
+    std::vector<RotaryArtwork> rotaryArtwork;
     std::vector<std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>> sliderAttachments;
     std::vector<std::unique_ptr<juce::ToggleButton>> switches;
+    std::vector<juce::Rectangle<int>> switchBounds;
     std::vector<std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment>> buttonAttachments;
     std::array<juce::ValueTree, 2> comparisonStates;
     juce::ValueTree copiedState;
     int activeComparison = 0;
-    float displayedInputPeak = 0.0f;
     float displayedOutputPeak = 0.0f;
+    float displayedClip = 0.0f;
+    int zoomPercent = 100;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(GalaxyTapeAudioProcessorEditor)
 };

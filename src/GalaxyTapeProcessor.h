@@ -34,8 +34,18 @@ public:
     void setStateInformation(const void* data, int sizeInBytes) override;
 
     juce::AudioProcessorValueTreeState parameters;
-    float getInputPeak() const noexcept { return inputPeak.load(); }
-    float getOutputPeak() const noexcept { return outputPeak.load(); }
+    float getInputPeak() const noexcept
+    {
+        return inputPeak.load(std::memory_order_relaxed);
+    }
+    float getOutputPeak() const noexcept
+    {
+        return outputPeak.load(std::memory_order_relaxed);
+    }
+    float getEffectiveDelayMs() const noexcept
+    {
+        return effectiveDelayMs.load(std::memory_order_relaxed);
+    }
 
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
 
@@ -50,10 +60,12 @@ private:
     std::array<float, 2> lowBandState{};
     std::array<float, 2> highBandState{};
     int writePosition = 0;
+    int currentReverbMode = -1;
     double currentSampleRate = 44100.0;
     double tapePhase = 0.0;
     std::atomic<float> inputPeak{0.0f};
     std::atomic<float> outputPeak{0.0f};
+    std::atomic<float> effectiveDelayMs{360.0f};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(GalaxyTapeAudioProcessor)
 };
