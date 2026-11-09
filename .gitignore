@@ -1,0 +1,7 @@
+/build/
+/dist/
+/.vs/
+/CMakeFiles/
+/CMakeCache.txt
+/.idea/
+*.user

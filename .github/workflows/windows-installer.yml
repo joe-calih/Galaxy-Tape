@@ -1,0 +1,52 @@
+name: Windows VST3 installer
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        run: cmake -S . -B build -A x64 -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build VST3
+        run: cmake --build build --config Release --target GalaxyTape_VST3 --parallel 2
+
+      - name: Install Inno Setup
+        run: choco install innosetup --yes --no-progress
+
+      - name: Package installer
+        shell: pwsh
+        run: |
+          $vst3 = Get-ChildItem -Path 'build' -Filter 'Galaxy Tape.vst3' -Directory -Recurse |
+            Select-Object -First 1 -ExpandProperty FullName
+          if (-not $vst3) { throw 'The VST3 bundle was not produced by the build.' }
+          $iscc = Join-Path ${env:ProgramFiles(x86)} 'Inno Setup 6\ISCC.exe'
+          if (-not (Test-Path $iscc)) { throw "Inno Setup compiler not found: $iscc" }
+          New-Item -ItemType Directory -Force -Path 'dist' | Out-Null
+          & $iscc "/DPluginVst3Path=$vst3" "/O$PWD\dist" 'installer\GalaxyTape.iss'
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Galaxy-Tape-Windows-Installer
+          path: dist/Galaxy-Tape-Setup.exe
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: dist/Galaxy-Tape-Setup.exe
