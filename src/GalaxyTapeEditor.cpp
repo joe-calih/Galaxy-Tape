@@ -430,16 +430,14 @@ void GalaxyTapeAudioProcessorEditor::drawBranding(juce::Graphics& g, float scale
         juce::roundToInt(259.0f * scale), juce::roundToInt(99.0f * scale),
         juce::roundToInt(254.0f * scale), juce::roundToInt(12.0f * scale));
 
-    g.setFont(juce::Font(juce::FontOptions("Bahnschrift", 16.0f * scale)
-                             .withStyle("SemiBold")));
+    g.setFont(juce::Font(juce::FontOptions("Bahnschrift", "SemiBold", 16.0f * scale)));
     g.setColour(juce::Colour(0xff151918).withAlpha(0.7f));
     g.drawText("Galaxy Tape", titleBounds.translated(0, 1),
                juce::Justification::centred, false);
     g.setColour(juce::Colour(0xff343a3b));
     g.drawText("Galaxy Tape", titleBounds, juce::Justification::centred, false);
 
-    g.setFont(juce::Font(juce::FontOptions("Bahnschrift", 7.5f * scale)
-                             .withStyle("Medium")));
+    g.setFont(juce::Font(juce::FontOptions("Bahnschrift", "Medium", 7.5f * scale)));
     g.setColour(juce::Colour(0xff353a3b));
     g.drawText("by loops.co.ke", subtitleBounds, juce::Justification::centred, false);
 }
@@ -478,8 +476,7 @@ void GalaxyTapeAudioProcessorEditor::drawHeadDisplays(juce::Graphics& g, float s
             juce::roundToInt(bounds.getWidth() - 7.0f * scale),
             juce::roundToInt(bounds.getHeight()));
 
-        g.setFont(juce::Font(juce::FontOptions("Consolas", 9.0f * scale)
-                                 .withStyle("Bold")));
+        g.setFont(juce::Font(juce::FontOptions("Consolas", "Bold", 9.0f * scale)));
         g.setColour(active ? juce::Colour(0xff42ff82).withAlpha(0.22f)
                            : juce::Colour(0xff39c56a).withAlpha(0.10f));
         g.drawFittedText(digits, digitBounds.expanded(1, 0),
@@ -489,8 +486,7 @@ void GalaxyTapeAudioProcessorEditor::drawHeadDisplays(juce::Graphics& g, float s
         g.drawFittedText(digits, digitBounds,
                          juce::Justification::centred, 1, 0.8f * scale);
 
-        g.setFont(juce::Font(juce::FontOptions("Bahnschrift", 5.2f * scale)
-                                 .withStyle("Medium")));
+        g.setFont(juce::Font(juce::FontOptions("Bahnschrift", "Medium", 5.2f * scale)));
         g.setColour(active ? juce::Colour(0xff87d498)
                            : juce::Colour(0xff48604d));
         g.drawText("ms", juce::roundToInt(bounds.getRight() - 8.0f * scale),
@@ -583,8 +579,7 @@ void GalaxyTapeAudioProcessorEditor::drawMeter(juce::Graphics& g)
 
     static const char* labels[]{"15", "10", "7", "5", "3", "0"};
     static const float labelPositions[]{636.0f, 650.0f, 665.0f, 678.0f, 691.0f, 704.0f};
-    g.setFont(juce::Font(juce::FontOptions("Bahnschrift", 5.5f * scale)
-                             .withStyle("SemiBold")));
+    g.setFont(juce::Font(juce::FontOptions("Bahnschrift", "SemiBold", 5.5f * scale)));
     g.setColour(juce::Colour(0xff96c2a4));
     for (size_t i = 0; i < std::size(labels); ++i)
         g.drawText(labels[i], juce::roundToInt(labelPositions[i] * scale),
