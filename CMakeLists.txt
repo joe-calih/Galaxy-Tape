@@ -33,6 +33,8 @@ juce_add_plugin(GalaxyTape
     VST3_CATEGORIES Fx Delay Reverb
 )
 
+juce_generate_juce_header(GalaxyTape)
+
 target_sources(GalaxyTape PRIVATE
     src/GalaxyTapeProcessor.cpp
     src/GalaxyTapeProcessor.h

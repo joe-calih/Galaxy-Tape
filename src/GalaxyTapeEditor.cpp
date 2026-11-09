@@ -236,7 +236,9 @@ void GalaxyTapeAudioProcessorEditor::addKnob(const juce::String& id,
     slider->setLookAndFeel(&galaxyLookAndFeel);
     slider->setRotaryParameters(juce::MathConstants<float>::pi * 1.25f,
                                 juce::MathConstants<float>::pi * 2.75f, true);
-    slider->setDoubleClickReturnValue(true, id == "head_select" ? 4.0 : 0.0);
+    if (auto* parameter = processor.parameters.getParameter(id))
+        slider->setDoubleClickReturnValue(true,
+            parameter->convertFrom0to1(parameter->getDefaultValue()));
     slider->setTooltip(name);
     addAndMakeVisible(*slider);
     sliderAttachments.push_back(std::make_unique<

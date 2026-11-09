@@ -27,8 +27,8 @@ installer places the VST3 in the shared Windows VST3 directory
 - **Echo Vol / Reverb Vol:** independent effect-return levels.
 - **Input Send:** controls whether new input is sent to the tape delay;
   existing repeats continue to decay when it is off.
-- **Tape stock:** click the small tape selector to cycle Splice, New, Used, and
-  Old. Older stock adds saturation, high-frequency loss, and more wow.
+- **Tape stock:** click the small tape selector to cycle New, Used, and Old.
+  Older stock adds saturation, high-frequency loss, and more wow.
 - **Wet Solo:** removes the dry input from the output. **Power** bypasses the
   effect.
 - **A/B, Copy, Paste:** compare two parameter states or copy/paste a state.
